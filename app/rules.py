@@ -37,6 +37,13 @@ SECURITY_RULES = [
         "pattern": r"(!\[.*?\]\(https?://[^\s\)]+(\?|&)[^\s\)]+)|(\b(curl|wget|fetch|post|send|transmit)\b.{0,50}\bhttps?://[^\s]+\b.{0,40}\b(secret|token|password|data|records?)\b)",
         "severity": "critical",
         "weight": 0.90
+    },
+    {
+        "id": "policy_tampering_or_filter_bypass",
+        "description": "Attempt to tamper with system policy, threshold parameters, or bypass safety filters",
+        "pattern": r"\b(bypass\s+all\s+(safety|security|content)\s+filters|set\s+sensitivity_threshold|disable\s+(guardrails|filters|rules))\b",
+        "severity": "high",
+        "weight": 0.85
     }
 ]
 
