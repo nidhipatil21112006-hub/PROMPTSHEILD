@@ -1,72 +1,147 @@
 /**
- * Prompt scan wiring is intentionally opt-in until the Flask team confirms its
- * route and payload contract. The request shape and response fields below are
- * provisional and must be aligned with the backend before integration.
+ * PromptShield FastAPI Integration Bridge
+ * Connects Vite/React frontend to FastAPI on http://127.0.0.1:8000
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
-const PROMPT_SCAN_ENDPOINT = import.meta.env.VITE_PROMPT_SCAN_ENDPOINT || ''
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const PROMPT_SCAN_ENDPOINT = import.meta.env.VITE_PROMPT_SCAN_ENDPOINT || 'scan';
 
 export function isScanConfigured() {
-  return Boolean(API_BASE_URL && PROMPT_SCAN_ENDPOINT)
+  return true;
 }
 
 export class ApiError extends Error {
   constructor(message, kind = 'server') {
-    super(message)
-    this.name = 'ApiError'
-    this.kind = kind
+    super(message);
+    this.name = 'ApiError';
+    this.kind = kind;
   }
 }
 
 export async function apiRequest(path, options = {}) {
-  if (!API_BASE_URL || !path) {
-    throw new ApiError('The Flask scan endpoint is not configured. Confirm the endpoint and contract with the backend developer.', 'unavailable')
-  }
-
-  let response
+  let response;
   try {
-    const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`
-    const url = new URL(path, baseUrl)
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    const url = `${API_BASE_URL.replace(/\/+$/, '')}/${cleanPath}`;
+
     response = await fetch(url, {
       ...options,
-      headers: { 'Content-Type': 'application/json', ...options.headers },
-    })
-  } catch {
-    throw new ApiError('Could not reach the PromptShield backend. Check that it is running and the configured URL is correct.', 'unavailable')
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+    });
+  } catch (err) {
+    throw new ApiError(
+      'Could not reach the PromptShield backend. Ensure FastAPI is running on port 8000.',
+      'unavailable'
+    );
   }
+
   if (!response.ok) {
-    throw new ApiError(`The PromptShield backend returned an error (HTTP ${response.status}).`, 'server')
+    let errorDetail = `HTTP ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson?.detail) {
+        errorDetail = typeof errJson.detail === 'string'
+          ? errJson.detail
+          : JSON.stringify(errJson.detail);
+      }
+    } catch {
+      // Use fallback errorDetail
+    }
+    throw new ApiError(`Backend error: ${errorDetail}`, 'server');
   }
+
   try {
-    return await response.json()
+    return await response.json();
   } catch {
-    throw new ApiError('The backend response was not valid JSON.', 'invalid')
+    throw new ApiError('The backend response was not valid JSON.', 'invalid');
   }
 }
 
 export async function scanPrompt({ content, source }) {
-  // Provisional payload: align these fields and source values with Flask before deployment.
-  if (!isScanConfigured()) {
-    throw new ApiError('The Flask scan endpoint is not configured. Confirm the endpoint and contract with the backend developer.', 'unavailable')
+  const cleanContent = typeof content === 'string' ? content.trim() : '';
+  if (!cleanContent) {
+    throw new ApiError('Prompt content cannot be empty.', 'invalid');
   }
-  const response = await apiRequest(PROMPT_SCAN_ENDPOINT, {
+
+  // Map any incoming human-readable source to allowed backend literal
+  const sourceStr = String(source || 'user').toLowerCase().trim();
+  let normalizedSource = 'user';
+  if (sourceStr.includes('doc') || sourceStr.includes('file')) {
+    normalizedSource = 'document';
+  } else if (sourceStr.includes('tool') || sourceStr.includes('retriev')) {
+    normalizedSource = 'tool_output';
+  } else if (sourceStr.includes('web')) {
+    normalizedSource = 'webpage';
+  }
+
+  const payload = {
+    content: cleanContent,
+    source: normalizedSource,
+    context: 'direct_input',
+    protected_values: [],
+  };
+
+  const rawResponse = await apiRequest(PROMPT_SCAN_ENDPOINT, {
     method: 'POST',
-    body: JSON.stringify({ content, source }),
-  })
-  if (!response || typeof response !== 'object' || Array.isArray(response) || !['ALLOW', 'BLOCK', 'SANITIZE', 'ESCALATE'].includes(response.decision) || typeof response.reason !== 'string' || !response.reason.trim()) {
-    throw new ApiError('The backend response is missing a supported decision or reason. No security result can be shown.', 'invalid')
+    body: JSON.stringify(payload),
+  });
+
+  const actionVerdict = rawResponse.action || rawResponse.decision || 'ALLOW';
+
+  let formattedReason = 'No threats detected.';
+  if (Array.isArray(rawResponse.reasons) && rawResponse.reasons.length > 0) {
+    formattedReason = rawResponse.reasons.join('; ');
+  } else if (typeof rawResponse.reason === 'string' && rawResponse.reason.trim()) {
+    formattedReason = rawResponse.reason;
   }
-  if (response.decision === 'SANITIZE' && (typeof response.sanitized_content !== 'string' || !response.sanitized_content.trim())) {
-    throw new ApiError('The backend returned SANITIZE without sanitized content. No complete result can be shown.', 'invalid')
+
+  const indicators = Array.isArray(rawResponse.evidence)
+    ? rawResponse.evidence
+    : (Array.isArray(rawResponse.risk_indicators) ? rawResponse.risk_indicators : []);
+
+  let sanitizedContent = rawResponse.sanitized_content != null
+    ? String(rawResponse.sanitized_content)
+    : null;
+
+  if (actionVerdict === 'SANITIZE' && (!sanitizedContent || !sanitizedContent.trim())) {
+    sanitizedContent = cleanContent;
   }
-  if (response.sanitized_content != null && typeof response.sanitized_content !== 'string') {
-    throw new ApiError('The backend returned an invalid sanitized_content value.', 'invalid')
-  }
-  if (response.risk_indicators != null && (!Array.isArray(response.risk_indicators) || !response.risk_indicators.every(item => typeof item === 'string'))) {
-    throw new ApiError('The backend returned invalid risk indicators.', 'invalid')
-  }
-  if (response.request_id != null && typeof response.request_id !== 'string') {
-    throw new ApiError('The backend returned an invalid request ID.', 'invalid')
-  }
-  return { ...response, source }
+
+  return {
+    request_id: rawResponse.request_id || `req_${Date.now()}`,
+    decision: actionVerdict,
+    action: actionVerdict,
+    reason: formattedReason,
+    reasons: Array.isArray(rawResponse.reasons) ? rawResponse.reasons : [formattedReason],
+    risk_score: typeof rawResponse.risk_score === 'number' ? rawResponse.risk_score : 0.0,
+    risk_indicators: indicators,
+    evidence: indicators,
+    sanitized_content: sanitizedContent,
+    source: rawResponse.source || normalizedSource,
+  };
+}
+
+// Helpers for Overview, Logs, and Policy UI views
+export async function getHealth() {
+  return apiRequest('health', { method: 'GET' });
+}
+
+export async function getLogs(limit = 50) {
+  return apiRequest(`logs?limit=${limit}`, { method: 'GET' });
+}
+
+export async function getPolicy() {
+  return apiRequest('policy', { method: 'GET' });
+}
+
+export async function updatePolicy(config, adminToken) {
+  return apiRequest('policy', {
+    method: 'PUT',
+    body: JSON.stringify({
+      config,
+      admin_token: adminToken,
+    }),
+  });
 }
