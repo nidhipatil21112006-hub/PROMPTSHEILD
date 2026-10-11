@@ -51,3 +51,38 @@
 {"request_id": "egress_c1b05b08", "scanned_at": null, "source": null, "action": "BLOCK", "risk_score": null, "reasons": ["Potential sensitive credential detected: openai_api_key"]}
 {"request_id": "egress_719a1cab", "scanned_at": null, "source": null, "action": "BLOCK", "risk_score": null, "reasons": ["Potential sensitive credential detected: openai_api_key"]}
 {"request_id": "db3998b6-80d4-49b3-98a7-5b7ab14e1fdb", "scanned_at": "2026-10-11T12:39:26.320728+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "e520b549-33b2-46c1-b7d3-fc89741ed156", "scanned_at": "2026-10-11T12:44:13.836325+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "4dac8a3b-ce7c-45d7-bd05-979c35773a6c", "scanned_at": "2026-10-11T12:44:13.863597+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to extract internal prompt boundaries or confidential secrets"]}
+{"request_id": "3a11c075-1421-4ec4-91fc-56c1847f6e54", "scanned_at": "2026-10-11T12:44:13.867770+00:00", "source": "tool_output", "action": "ALLOW", "risk_score": 0.59, "reasons": []}
+{"request_id": "c57c860d-3bba-4675-bdda-4e01a48fac56", "scanned_at": "2026-10-11T12:44:13.871518+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "3865191a-4bec-4e15-9648-ae81a3d80422", "scanned_at": "2026-10-11T12:44:13.877869+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.49, "reasons": []}
+{"request_id": "63d8d49c-3dbe-4514-b942-8159258f3596", "scanned_at": "2026-10-11T12:44:13.882584+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to override system boundaries or disregard developer instructions"]}
+{"request_id": "1fa4de28-f8de-4f5e-b03f-fa9a50bc9804", "scanned_at": "2026-10-11T12:44:13.887240+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.55, "reasons": []}
+{"request_id": "9642d41c-5936-42c7-a6b4-e4ac187a0e92", "scanned_at": "2026-10-11T12:44:14.711912+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "cc90f32e-9f6a-4894-8f6c-493249338ac3", "scanned_at": "2026-10-11T12:44:14.718059+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to extract internal prompt boundaries or confidential secrets"]}
+{"request_id": "0d84ca49-e933-4f4e-afd4-493e80b08d70", "scanned_at": "2026-10-11T12:44:14.722840+00:00", "source": "tool_output", "action": "ALLOW", "risk_score": 0.59, "reasons": []}
+{"request_id": "1796d23b-9208-4ef5-ab9c-a33d53a8c79b", "scanned_at": "2026-10-11T12:44:14.726925+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "4fa354ed-7c1b-4c5f-9955-c050624b8ea3", "scanned_at": "2026-10-11T12:44:14.730335+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.49, "reasons": []}
+{"request_id": "01dfb2f4-1c6f-4818-a3c6-7b2a2f544cc6", "scanned_at": "2026-10-11T12:44:14.733454+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to override system boundaries or disregard developer instructions"]}
+{"request_id": "d00615ce-4adb-4d03-b3fd-8ad5a9c2225f", "scanned_at": "2026-10-11T12:44:14.736865+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.55, "reasons": []}
+{"request_id": "cb9e715d-2c2b-4280-ac74-b059af3bb2dc", "scanned_at": "2026-10-11T12:44:35.580400+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "4be99ea2-d322-47f3-97b3-3dc308cbc48c", "scanned_at": "2026-10-11T12:44:36.598644+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "ef0dc8db-8db2-40ac-961b-47ba5b97161b", "scanned_at": "2026-10-11T12:44:37.512938+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "ef83f0dc-0a6c-48a2-b8bc-1da915b0b1b9", "scanned_at": "2026-10-11T12:44:40.828685+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "83c7228a-3248-412f-9f57-2ff95cd3fd2e", "scanned_at": "2026-10-11T12:44:40.839783+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to extract internal prompt boundaries or confidential secrets"]}
+{"request_id": "f6e8830f-01fc-4cc8-bf4b-e40e058d1d64", "scanned_at": "2026-10-11T12:44:40.847739+00:00", "source": "tool_output", "action": "ALLOW", "risk_score": 0.59, "reasons": []}
+{"request_id": "82e2dc49-1180-4c12-9676-b4a3901db2be", "scanned_at": "2026-10-11T12:44:40.853494+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "f2c1e13f-bc6a-4df6-8cf6-4620e1de1c23", "scanned_at": "2026-10-11T12:44:40.858922+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.49, "reasons": []}
+{"request_id": "898612f4-89eb-463d-85b4-45abf231c894", "scanned_at": "2026-10-11T12:44:40.863804+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to override system boundaries or disregard developer instructions"]}
+{"request_id": "bc63239d-4520-4669-85e0-73f0e020d36c", "scanned_at": "2026-10-11T12:44:40.868326+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.55, "reasons": []}
+{"request_id": "a9ddc01d-0a6f-4d24-8d83-03a90597bf9a", "scanned_at": "2026-10-11T12:44:41.495626+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.58, "reasons": []}
+{"request_id": "e9247067-0a7d-46c3-baae-045deb3a1ec1", "scanned_at": "2026-10-11T12:44:41.504295+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to extract internal prompt boundaries or confidential secrets"]}
+{"request_id": "e7aebb6e-6545-41a1-9102-ed6b0dc0eff1", "scanned_at": "2026-10-11T12:44:41.512533+00:00", "source": "tool_output", "action": "ALLOW", "risk_score": 0.59, "reasons": []}
+{"request_id": "c47da7b9-296d-4961-9edc-c9e6ad658981", "scanned_at": "2026-10-11T12:44:41.518365+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "e856914a-0d8e-4de9-985e-9ae03996f5da", "scanned_at": "2026-10-11T12:44:41.523354+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.49, "reasons": []}
+{"request_id": "3cceb1d2-a121-4923-a302-e1b1d6835646", "scanned_at": "2026-10-11T12:44:41.528964+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to override system boundaries or disregard developer instructions"]}
+{"request_id": "1daf3cae-87e7-4da1-95f8-fbe1be9513b2", "scanned_at": "2026-10-11T12:44:41.532576+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.55, "reasons": []}
+{"request_id": "a3fe75b0-9b6d-459a-9d1c-d018bbec668b", "scanned_at": "2026-10-11T13:03:58.809473+00:00", "source": "document", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "8162d52b-6a41-4665-834c-7430076f83a3", "scanned_at": "2026-10-11T13:17:44.814147+00:00", "source": "user", "action": "BLOCK", "risk_score": 0.85, "reasons": ["Attempt to override system boundaries or disregard developer instructions", "Attempt to extract internal prompt boundaries or confidential secrets"]}
+{"request_id": "07846d68-819b-4b9f-b28d-bb1a7b0b7c5f", "scanned_at": "2026-10-11T13:18:22.201748+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
+{"request_id": "8f9ea5c9-6f09-4375-9f95-cf7a93c31dbc", "scanned_at": "2026-10-11T13:20:10.485657+00:00", "source": "user", "action": "ALLOW", "risk_score": 0.53, "reasons": []}
