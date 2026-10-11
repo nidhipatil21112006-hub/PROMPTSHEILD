@@ -13,6 +13,7 @@ from app.scanner import scan_text
 from app.classifier import predict_injection
 from app.policy import get_policy, update_policy
 from app.audit import record_scan_event, get_recent_logs
+from app.egress import EgressScanRequest, EgressScanResponse, scan_egress
 
 app = FastAPI(
     title="PromptShield API",
@@ -20,7 +21,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Open CORS configuration for teammate's React/Vite/Next.js frontend
+# Open CORS configuration for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -41,14 +42,15 @@ def health():
         "status": "healthy",
         "service": "PromptShield",
         "version": "1.0.0",
-        "inference_engine": "100% Local (scikit-learn + deterministic rules)"
+        "inference_engine": "100% Local (scikit-learn + deterministic rules)",
+        "egress_firewall": "ACTIVE"
     }
 
 
 @app.post("/scan", response_model=ScanResponse)
 def scan_endpoint(req: ScanRequest):
     """
-    Main middleware inspection endpoint.
+    Ingress middleware inspection endpoint.
     Takes incoming text, source type, and optional protected secrets.
     """
     policy = get_policy()
@@ -63,6 +65,22 @@ def scan_endpoint(req: ScanRequest):
         untrusted_source_escalate=policy.untrusted_source_escalate,
         sanitize_high_confidence=policy.sanitize_high_confidence,
         classifier_score=ml_score
+    )
+
+    record_scan_event(res.model_dump())
+    return res
+
+
+@app.post("/scan/egress", response_model=EgressScanResponse)
+def scan_egress_endpoint(req: EgressScanRequest):
+    """
+    Egress response firewall endpoint.
+    Inspects model outputs for canary leaks, secrets, and data exfiltration.
+    """
+    res = scan_egress(
+        content=req.content,
+        canary_tokens=req.canary_tokens,
+        protected_values=req.protected_values
     )
 
     record_scan_event(res.model_dump())
