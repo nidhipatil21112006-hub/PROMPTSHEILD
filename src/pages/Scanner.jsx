@@ -1,15 +1,15 @@
 import { useState } from 'react'
 
-const ingressSources = [
+const sources = [
   { label: 'User Input', value: 'user' },
   { label: 'Uploaded Document', value: 'document' },
   { label: 'Tool/Retrieved Content', value: 'tool_output' },
 ]
 
 const egressTargets = [
-  { label: 'Canary & System Prompts', value: 'canary' },
-  { label: 'API Keys & Credentials', value: 'secrets' },
-  { label: 'Data Exfiltration / PII', value: 'exfiltration' },
+  { label: 'Canary Token Check', value: 'canary' },
+  { label: 'API Keys & Secrets', value: 'secrets' },
+  { label: 'Exfiltration & PII', value: 'exfiltration' },
 ]
 
 const decisions = ['ALLOW', 'SANITIZE', 'BLOCK', 'ESCALATE']
@@ -69,7 +69,7 @@ function Header({ eyebrow, title, text, mode }) {
 }
 
 export default function Scanner() {
-  const [mode, setMode] = useState('ingress') // 'ingress' | 'egress'
+  const [mode, setMode] = useState('ingress')
   const [content, setContent] = useState('')
   const [source, setSource] = useState('user')
   const [egressTarget, setEgressTarget] = useState('canary')
@@ -175,23 +175,53 @@ export default function Scanner() {
         mode={mode}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', gap: '8px' }}>
-        <button
-          type="button"
-          className={`button ${mode === 'ingress' ? 'button-gold' : 'button-ghost'}`}
-          style={{ padding: '6px 14px', fontSize: '13px' }}
-          onClick={() => switchMode('ingress')}
+      {/* Top Mode Switcher */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            padding: '3px',
+            background: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: '4px',
+            border: '1px solid rgba(213, 206, 163, 0.15)',
+            gap: '3px',
+          }}
         >
-          Ingress (Prompts)
-        </button>
-        <button
-          type="button"
-          className={`button ${mode === 'egress' ? 'button-gold' : 'button-ghost'}`}
-          style={{ padding: '6px 14px', fontSize: '13px' }}
-          onClick={() => switchMode('egress')}
-        >
-          Egress (Model Responses)
-        </button>
+          <button
+            type="button"
+            onClick={() => switchMode('ingress')}
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 500,
+              borderRadius: '3px',
+              border: 'none',
+              cursor: 'pointer',
+              background: mode === 'ingress' ? '#d5cea3' : 'transparent',
+              color: mode === 'ingress' ? '#1a120c' : '#b7ad94',
+              transition: 'background 0.15s ease',
+            }}
+          >
+            Ingress (Prompts)
+          </button>
+          <button
+            type="button"
+            onClick={() => switchMode('egress')}
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 500,
+              borderRadius: '3px',
+              border: 'none',
+              cursor: 'pointer',
+              background: mode === 'egress' ? '#d5cea3' : 'transparent',
+              color: mode === 'egress' ? '#1a120c' : '#b7ad94',
+              transition: 'background 0.15s ease',
+            }}
+          >
+            Egress (Model Responses)
+          </button>
+        </div>
       </div>
 
       <div className="scanner-layout">
@@ -204,19 +234,27 @@ export default function Scanner() {
             <span className="step-index">{mode === 'ingress' ? '01 / 02' : 'EGRESS / 01'}</span>
           </div>
 
+          {/* Presets */}
           <div style={{ marginBottom: '14px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', opacity: 0.7 }}>Presets:</span>
+            <span style={{ fontSize: '10px', opacity: 0.6, letterSpacing: '0.1em' }}>PRESETS:</span>
             {(mode === 'ingress' ? ingressSamples : egressSamples).map((s) => (
               <button
                 type="button"
                 key={s.label}
-                className="button button-ghost"
-                style={{ padding: '4px 10px', fontSize: '12px' }}
                 onClick={() => {
                   setContent(s.content)
                   if (s.source) setSource(s.source)
                   if (s.target) setEgressTarget(s.target)
                   if (s.canary) setCanaryToken(s.canary)
+                }}
+                style={{
+                  padding: '4px 10px',
+                  fontSize: '11px',
+                  borderRadius: '3px',
+                  background: 'rgba(213, 206, 163, 0.05)',
+                  border: '1px solid rgba(213, 206, 163, 0.15)',
+                  color: '#d5cea3',
+                  cursor: 'pointer',
                 }}
               >
                 {s.label}
@@ -224,22 +262,42 @@ export default function Scanner() {
             ))}
           </div>
 
+          {/* Source / Inspection Category Pills */}
           <div style={{ marginBottom: '16px' }}>
-            <div className="eyebrow" style={{ marginBottom: '8px', fontSize: '11px' }}>
+            <div className="eyebrow" style={{ marginBottom: '8px' }}>
               {mode === 'ingress' ? 'SOURCE CATEGORY' : 'FIREWALL INSPECTION PROFILE'}
             </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {(mode === 'ingress' ? ingressSources : egressTargets).map((item) => {
+            <div
+              style={{
+                display: 'inline-flex',
+                gap: '4px',
+                padding: '3px',
+                background: 'rgba(0, 0, 0, 0.25)',
+                borderRadius: '4px',
+                border: '1px solid rgba(213, 206, 163, 0.12)',
+                flexWrap: 'wrap',
+              }}
+            >
+              {(mode === 'ingress' ? sources : egressTargets).map((item) => {
                 const isSelected = mode === 'ingress' ? source === item.value : egressTarget === item.value
                 return (
                   <button
                     type="button"
                     key={item.value}
-                    className={`button ${isSelected ? 'button-gold' : 'button-ghost'}`}
-                    style={{ padding: '6px 12px', fontSize: '12px' }}
                     onClick={() => {
                       if (mode === 'ingress') setSource(item.value)
                       else setEgressTarget(item.value)
+                    }}
+                    style={{
+                      padding: '6px 13px',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      borderRadius: '3px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: isSelected ? '#d5cea3' : 'transparent',
+                      color: isSelected ? '#1a120c' : '#b7ad94',
+                      transition: 'background 0.15s ease',
                     }}
                   >
                     {item.label}
@@ -262,34 +320,62 @@ export default function Scanner() {
               style={{
                 width: '100%',
                 padding: '12px',
-                background: 'rgba(0,0,0,0.25)',
+                background: 'rgba(0, 0, 0, 0.28)',
                 color: 'inherit',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '6px',
+                border: '1px solid rgba(213, 206, 163, 0.15)',
+                borderRadius: '3px',
                 fontFamily: 'monospace',
-                fontSize: '14px',
+                fontSize: '13px',
                 resize: 'vertical',
                 boxSizing: 'border-box',
+                outline: 'none',
               }}
             />
           </div>
 
           {error && <div style={{ color: '#ff6b6b', fontSize: '13px', marginTop: '10px' }}>{error}</div>}
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
             <button
               type="button"
-              className="button button-gold"
               onClick={handleScan}
               disabled={loading}
-              style={{ flex: 1 }}
+              style={{
+                flex: 1,
+                padding: '11px 20px',
+                fontSize: '13px',
+                fontWeight: 600,
+                borderRadius: '3px',
+                border: 'none',
+                background: '#d5cea3',
+                color: '#1a120c',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                opacity: loading ? 0.7 : 1,
+              }}
             >
-              {loading ? <><span className="button-spinner" /> Scanning…</> : `Run ${mode === 'ingress' ? 'Ingress' : 'Egress'} Inspection →`}
+              {loading ? (
+                <>Scanning…</>
+              ) : (
+                <>Run {mode === 'ingress' ? 'Ingress' : 'Egress'} Inspection <span style={{ fontSize: '15px' }}>↗</span></>
+              )}
             </button>
             <button
               type="button"
-              className="button button-ghost"
               onClick={handleClear}
+              style={{
+                padding: '11px 18px',
+                fontSize: '13px',
+                borderRadius: '3px',
+                border: '1px solid rgba(213, 206, 163, 0.2)',
+                background: 'transparent',
+                color: '#b7ad94',
+                cursor: 'pointer',
+              }}
             >
               Clear
             </button>
@@ -307,22 +393,28 @@ export default function Scanner() {
 
           {result ? (
             <div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '18px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '18px' }}>
                 {decisions.map((d) => {
                   const isActive = (result.action === d || result.decision === d)
+                  const isBlock = d === 'BLOCK'
                   return (
                     <div
                       key={d}
-                      className={isActive ? (d === 'BLOCK' ? 'badge badge-block' : 'badge badge-gold') : ''}
                       style={{
                         textAlign: 'center',
-                        padding: '10px 4px',
-                        fontSize: '12px',
+                        padding: '9px 4px',
+                        fontSize: '11px',
                         fontWeight: 700,
-                        borderRadius: '6px',
-                        border: isActive ? undefined : '1px solid rgba(255,255,255,0.08)',
-                        background: isActive ? undefined : 'rgba(255,255,255,0.02)',
-                        opacity: isActive ? 1 : 0.45,
+                        borderRadius: '3px',
+                        border: isActive
+                          ? (isBlock ? '1px solid #ef4444' : '1px solid #d5cea3')
+                          : '1px solid rgba(213, 206, 163, 0.1)',
+                        background: isActive
+                          ? (isBlock ? 'rgba(239, 68, 68, 0.2)' : 'rgba(213, 206, 163, 0.18)')
+                          : 'rgba(0, 0, 0, 0.15)',
+                        color: isActive
+                          ? (isBlock ? '#ff8080' : '#d5cea3')
+                          : '#665b49',
                       }}
                     >
                       {d}
@@ -331,25 +423,25 @@ export default function Scanner() {
                 })}
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(213, 206, 163, 0.1)' }}>
                 <div>
-                  <div className="eyebrow" style={{ fontSize: '10px' }}>RISK CLASSIFICATION</div>
-                  <div style={{ fontSize: '15px', fontWeight: 700, textTransform: 'uppercase', color: result.risk_level === 'critical' || result.action === 'BLOCK' ? '#ff6b6b' : '#d4af37' }}>
-                    {result.risk_level || (result.risk_score !== undefined ? `${Math.round(result.risk_score * 100)}% Risk` : 'LOW RISK')}
+                  <div className="eyebrow">RISK CLASSIFICATION</div>
+                  <div style={{ fontSize: '15px', fontWeight: 700, textTransform: 'uppercase', color: result.risk_level === 'critical' || result.action === 'BLOCK' ? '#ff6b6b' : '#d5cea3' }}>
+                    {result.risk_level || (result.risk_score !== undefined ? `${Math.round(result.risk_score * 100)}% RISK` : 'LOW RISK')}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div className="eyebrow" style={{ fontSize: '10px' }}>REQUEST ID</div>
-                  <div style={{ fontSize: '12px', fontFamily: 'monospace', opacity: 0.7 }}>
+                  <div className="eyebrow">REQUEST ID</div>
+                  <div style={{ fontSize: '11px', fontFamily: 'monospace', opacity: 0.6 }}>
                     {result.request_id || 'N/A'}
                   </div>
                 </div>
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <div className="eyebrow" style={{ fontSize: '10px', marginBottom: '6px' }}>REASONS & VIOLATIONS</div>
+                <div className="eyebrow" style={{ marginBottom: '6px' }}>REASONS & VIOLATIONS</div>
                 <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', lineHeight: '1.6' }}>
-                  {(result.reasons || (result.reason ? [result.reason] : ['No exfiltration or leaks detected.'])).map((r, i) => (
+                  {(result.reasons || (result.reason ? [result.reason] : ['No threats detected.'])).map((r, i) => (
                     <li key={i}>{r}</li>
                   ))}
                 </ul>
@@ -357,10 +449,14 @@ export default function Scanner() {
 
               {((result.evidence && result.evidence.length > 0) || (result.risk_indicators && result.risk_indicators.length > 0)) && (
                 <div style={{ marginBottom: '14px' }}>
-                  <div className="eyebrow" style={{ fontSize: '10px', marginBottom: '6px' }}>LEAK PATTERNS / EVIDENCE</div>
+                  <div className="eyebrow" style={{ marginBottom: '6px' }}>LEAK PATTERNS / EVIDENCE</div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {(result.evidence || result.risk_indicators || []).map((ev, i) => (
-                      <span key={i} className="badge badge-gold" style={{ fontSize: '11px' }}>
+                      <span
+                        key={i}
+                        className="badge badge-gold"
+                        style={{ fontSize: '11px' }}
+                      >
                         {ev}
                       </span>
                     ))}
@@ -369,27 +465,34 @@ export default function Scanner() {
               )}
 
               {result.sanitized_content && (
-                <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(213, 206, 163, 0.1)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <div className="eyebrow" style={{ fontSize: '10px' }}>REDACTED / SANITIZED OUTPUT</div>
+                    <div className="eyebrow">REDACTED / SANITIZED OUTPUT</div>
                     <button
                       type="button"
-                      className="button button-ghost"
-                      style={{ padding: '2px 8px', fontSize: '11px' }}
                       onClick={copySanitized}
+                      style={{
+                        padding: '2px 8px',
+                        fontSize: '11px',
+                        borderRadius: '3px',
+                        background: 'transparent',
+                        border: '1px solid rgba(213, 206, 163, 0.2)',
+                        color: '#d5cea3',
+                        cursor: 'pointer',
+                      }}
                     >
                       Copy
                     </button>
                   </div>
                   <pre
                     style={{
-                      background: 'rgba(0,0,0,0.3)',
+                      background: 'rgba(0, 0, 0, 0.3)',
                       padding: '10px',
-                      borderRadius: '4px',
+                      borderRadius: '3px',
                       fontSize: '12px',
                       whiteSpace: 'pre-wrap',
                       margin: 0,
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(213, 206, 163, 0.1)',
                     }}
                   >
                     {result.sanitized_content}

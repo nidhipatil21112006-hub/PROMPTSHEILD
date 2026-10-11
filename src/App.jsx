@@ -6,11 +6,11 @@ import Policies from './pages/Policies.jsx'
 import AuditLogs from './pages/AuditLogs.jsx'
 
 const pages = [
-  { id: 'overview', label: 'Overview', icon: '◫' },
-  { id: 'scanner', label: 'Prompt scanner', icon: '⌕' },
-  { id: 'lab', label: 'Test lab', icon: '⌘' },
-  { id: 'policies', label: 'Policy settings', icon: '◇' },
-  { id: 'audit', label: 'Audit logs', icon: '≡' },
+  { id: 'overview', label: 'Overview' },
+  { id: 'scanner', label: 'Prompt Scanner' },
+  { id: 'lab', label: 'Test Lab' },
+  { id: 'policies', label: 'Policy Settings' },
+  { id: 'audit', label: 'Audit Logs' },
 ]
 
 const sample = 'Sample interface data · not connected to backend'
@@ -126,18 +126,14 @@ function Overview({ navigate }) {
 export default function App() {
   const getInitialPage = () => {
     const hash = window.location.hash.replace('#', '')
-    return pages.some((p) => p.id === hash) ? hash : 'scanner'
+    return pages.some((p) => p.id === hash) ? hash : 'overview'
   }
 
   const [active, setActive] = useState(getInitialPage)
-  const [mobileOpen, setMobileOpen] = useState(false)
-
-  const current = pages.find((p) => p.id === active) || pages[1]
 
   const navigate = (id) => {
     window.location.hash = id
     setActive(id)
-    setMobileOpen(false)
   }
 
   useEffect(() => {
@@ -152,96 +148,138 @@ export default function App() {
   }, [])
 
   return (
-    <div className="app-shell">
-      <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
+    <div style={{ minHeight: '100vh', background: 'var(--espresso, #16100c)', color: 'var(--ivory, #f5f2eb)' }}>
+      {/* Top Horizontal Navigation Bar */}
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 32px',
+          height: '68px',
+          borderBottom: '1px solid var(--line, rgba(213, 206, 163, 0.12))',
+          background: 'rgba(26, 18, 12, 0.95)',
+          backdropFilter: 'blur(10px)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+        }}
+      >
+        {/* Brand Left */}
         <button
           type="button"
-          className="brand"
-          style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', width: '100%' }}
           onClick={() => navigate('overview')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            color: 'inherit',
+          }}
         >
-          <span className="brand-mark">
-            <svg viewBox="0 0 40 44">
+          <div style={{ width: '28px', height: '32px' }}>
+            <svg viewBox="0 0 40 44" style={{ width: '100%', height: '100%', fill: 'none', stroke: 'var(--gold, #d5cea3)', strokeWidth: 1.5 }}>
               <path d="M20 2 37 8v12c0 11-7 18-17 22C10 38 3 31 3 20V8L20 2Z" />
               <path d="M20 11 29 14v7c0 6-4 10-9 13-5-3-9-7-9-13v-7l9-3Z" />
             </svg>
-          </span>
-          <span>PROMPT<b>SHIELD</b><small>SECURITY WORKSPACE</small></span>
+          </div>
+          <div style={{ textAlign: 'left', lineHeight: '1.2' }}>
+            <div style={{ fontSize: '13px', letterSpacing: '0.15em', fontWeight: 600 }}>
+              PROMPT<b style={{ color: 'var(--gold, #d5cea3)' }}>SHIELD</b>
+            </div>
+            <div style={{ fontSize: '8px', letterSpacing: '0.18em', color: '#978d75', marginTop: '2px' }}>
+              SECURITY WORKSPACE
+            </div>
+          </div>
         </button>
 
-        <div className="sidebar-rule" />
-        <div className="nav-label">WORKSPACE <span>01—05</span></div>
-
-        <nav>
-          {pages.map((p, i) => (
-            <button
-              type="button"
-              key={p.id}
-              className={`nav-item ${active === p.id ? 'active' : ''}`}
-              aria-current={active === p.id ? 'page' : undefined}
-              onClick={() => navigate(p.id)}
-            >
-              <span className="nav-icon">{p.icon}</span>
-              <span>{p.label}</span>
-              <span className="nav-number">0{i + 1}</span>
-            </button>
-          ))}
+        {/* Center Nav Tabs */}
+        <nav style={{ display: 'flex', gap: '32px', height: '100%' }}>
+          {pages.map((p) => {
+            const isActive = active === p.id
+            return (
+              <button
+                type="button"
+                key={p.id}
+                onClick={() => navigate(p.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: isActive ? '2px solid var(--gold, #d5cea3)' : '2px solid transparent',
+                  padding: '0 4px',
+                  color: isActive ? 'var(--gold, #d5cea3)' : '#b7ad94',
+                  fontSize: '13px',
+                  fontWeight: isActive ? 600 : 500,
+                  cursor: 'pointer',
+                  transition: 'color 0.15s ease, border-color 0.15s ease',
+                  height: '100%',
+                }}
+              >
+                {p.label}
+              </button>
+            )
+          })}
         </nav>
 
-        <div className="sidebar-bottom">
-          <div className="sidebar-decoration">
-            <span className="tiny-orbit" /> <span>TRUST, BY DESIGN</span>
+        {/* Topbar Right Meta */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', letterSpacing: '0.1em', color: '#b7ad94' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#7bed9f', boxShadow: '0 0 8px #7bed9f' }} />
+            PROXY ACTIVE
           </div>
-          <div className="workspace-user">
-            <span className="avatar">P</span>
-            <span><b>Local workspace</b><small>Security Gateway</small></span>
-            <span className="more">···</span>
-          </div>
-        </div>
-      </aside>
 
-      <div className="main-column">
-        <div className="topbar">
-          <button
-            type="button"
-            className="menu-button"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle navigation"
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              paddingLeft: '16px',
+              borderLeft: '1px solid rgba(213, 206, 163, 0.15)',
+            }}
           >
-            ☰
-          </button>
-          <div className="breadcrumbs">
-            PROMPTSHIELD <span>/</span> <b>{current.label.toUpperCase()}</b>
-          </div>
-          <div className="topbar-right">
-            <span className="environment"><i /> PROXY ACTIVE</span>
-            <span className="topbar-divider" />
-            <button type="button" className="icon-button" aria-label="Help" title="Help">?</button>
+            <div
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '3px',
+                background: 'rgba(213, 206, 163, 0.15)',
+                border: '1px solid rgba(213, 206, 163, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: 'var(--gold, #d5cea3)',
+              }}
+            >
+              P
+            </div>
+            <div style={{ lineHeight: '1.2', fontSize: '11px' }}>
+              <div style={{ fontWeight: 600, color: 'var(--ivory, #f5f2eb)' }}>Local workspace</div>
+              <div style={{ fontSize: '9px', color: '#978d75' }}>Security Gateway</div>
+            </div>
           </div>
         </div>
+      </header>
 
-        <main className="page-content">
-          {active === 'overview' && <div className="page-view"><Overview navigate={navigate} /></div>}
-          {active === 'scanner' && <div className="page-view"><Scanner /></div>}
-          {active === 'lab' && <div className="page-view"><TestLab /></div>}
-          {active === 'policies' && <div className="page-view"><Policies /></div>}
-          {active === 'audit' && <div className="page-view"><AuditLogs /></div>}
+      {/* Main Container Content */}
+      <main style={{ maxWidth: '1240px', margin: '0 auto', padding: '36px 32px 64px' }}>
+        {active === 'overview' && <div className="page-view"><Overview navigate={navigate} /></div>}
+        {active === 'scanner' && <div className="page-view"><Scanner /></div>}
+        {active === 'lab' && <div className="page-view"><TestLab /></div>}
+        {active === 'policies' && <div className="page-view"><Policies /></div>}
+        {active === 'audit' && <div className="page-view"><AuditLogs /></div>}
 
-          <footer className="footer">
-            <span>© PROMPTSHIELD <span className="footer-dot">/</span> GATEWAY ACTIVE</span>
-            <span>SECURITY STARTS WITH CLARITY <span className="footer-star">✳</span></span>
-          </footer>
-        </main>
-      </div>
-
-      {mobileOpen && (
-        <button
-          type="button"
-          className="scrim"
-          onClick={() => setMobileOpen(false)}
-          aria-label="Close navigation"
-        />
-      )}
+        <footer style={{ marginTop: '64px', paddingTop: '24px', borderTop: '1px solid var(--line, rgba(213, 206, 163, 0.1))', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#978d75', letterSpacing: '0.08em' }}>
+          <span>© PROMPTSHIELD / GATEWAY ACTIVE</span>
+          <span>SECURITY STARTS WITH CLARITY ✳</span>
+        </footer>
+      </main>
     </div>
   )
 }
