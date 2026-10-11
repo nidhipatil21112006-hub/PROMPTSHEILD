@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#E5E5CB;background:#1A120B;font-synthesis:none;text-rendering:optimizeLegibility;font-smooth:always;font-optical-sizing:auto;font-weight:400;--espresso:#1A120B;--walnut:#3C2A21;--gold:#D5CEA3;--ivory:#E5E5CB;--muted:#a89f83;--line:rgba(213,206,163,.17)}
+*{box-sizing:border-box}body{margin:0;min-width:320px;min-height:100vh;background:var(--espresso)}button,a,select{font:inherit}button{color:inherit}button:focus-visible,a:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:3px}::selection{background:var(--gold);color:var(--espresso)}
